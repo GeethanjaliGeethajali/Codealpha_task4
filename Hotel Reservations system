@@ -1,0 +1,155 @@
+import java.util.*;
+
+class HotelReservationSystem {
+    private static final int MAX_ROOMS = 150;
+    private Room[] rooms;
+    private int numRooms;
+
+    public HotelReservationSystem() {
+        rooms = new Room[MAX_ROOMS];
+        numRooms = 0;
+    }
+
+    public void addRoom(Room room) {
+        if (numRooms < MAX_ROOMS) {
+            rooms[numRooms++] = room;
+        } else {
+            System.out.println("Hotel is fully booked.");
+        }
+    }
+
+    public void displayAvailableRooms() {
+        System.out.println("Available Rooms:");
+        boolean anyAvailable = false;
+        for (int i = 0; i < numRooms; i++) {
+            if (!rooms[i].isOccupied()) {
+                System.out.println(rooms[i].toString());
+                anyAvailable = true;
+            }
+        }
+        if (!anyAvailable) {
+            System.out.println("No rooms available.");
+        }
+    }
+
+    public boolean makeReservation(int roomNumber, String guestName, int numDays) {
+        Room room = getRoomByNumber(roomNumber);
+        if (room != null && !room.isOccupied()) {
+            room.setOccupied(true);
+            room.setGuestName(guestName);
+            room.setReservationDays(numDays);
+            System.out.println("Reservation successful for " + guestName + " in room " + roomNumber);
+            return true;
+        } else {
+            System.out.println("Room is not available or invalid room number.");
+            return false;
+        }
+    }
+
+    public void viewBookingDetails(int roomNumber) {
+        Room room = getRoomByNumber(roomNumber);
+        if (room != null) {
+            System.out.println(room.toString());
+        } else {
+            System.out.println("Invalid room number.");
+        }
+    }
+
+    public void processPayment(int roomNumber) {
+        Room room = getRoomByNumber(roomNumber);
+        if (room != null && room.isOccupied()) {
+            double totalCost = room.getPricePerNight() * room.getReservationDays();
+            System.out.println("Payment processed for " + room.getGuestName() + ". Total amount: $" + totalCost);
+        } else {
+            System.out.println("Invalid room number or room is not occupied.");
+        }
+    }
+
+    private Room getRoomByNumber(int roomNumber) {
+        for (int i = 0; i < numRooms; i++) {
+            if (rooms[i].getRoomNumber() == roomNumber) {
+                return rooms[i];
+            }
+        }
+        return null;
+    }
+}
+
+class Room {
+    private int roomNumber;
+    private String roomType;
+    private double pricePerNight;
+    private boolean isOccupied;
+    private String guestName;
+    private int reservationDays;
+
+    public Room(int roomNumber, String roomType, double pricePerNight) {
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.pricePerNight = pricePerNight;
+        this.isOccupied = false;
+        this.guestName = "";
+        this.reservationDays = 0;
+    }
+
+    public int getRoomNumber() {
+        return roomNumber;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public double getPricePerNight() {
+        return pricePerNight;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.isOccupied = occupied;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public void setReservationDays(int reservationDays) {
+        this.reservationDays = reservationDays;
+    }
+
+    public int getReservationDays() {
+        return reservationDays;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public String toString() {
+        return "Room Number: " + roomNumber +
+                "\nRoom Type: " + roomType +
+                "\nPrice Per Night: $" + pricePerNight +
+                "\nIs Occupied: " + isOccupied +
+                "\nGuest Name: " + (guestName.isEmpty() ? "N/A" : guestName) +
+                "\nReservation Days: " + reservationDays;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        HotelReservationSystem hotel = new HotelReservationSystem();
+        hotel.addRoom(new Room(101, "Standard", 120.0));
+        hotel.addRoom(new Room(102, "Deluxe", 180.0));
+        hotel.addRoom(new Room(103, "Suite", 250.0));
+
+        hotel.displayAvailableRooms();
+
+        hotel.makeReservation(101, "George Joe", 3);
+        hotel.viewBookingDetails(101);
+
+        hotel.processPayment(101);
+    }
+}
